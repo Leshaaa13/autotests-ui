@@ -1,5 +1,3 @@
-from os import stat_result
-
 from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
