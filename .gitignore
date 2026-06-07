@@ -1,0 +1,21 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pytest cache
+.pytest_cache/
+
+# Virtual environment
+.venv/
+venv/
+
+# IDE settings
+.idea/
+
+# Playwright browser states
+browser-state.json
+browser-state2.json
+tests/browser-state.json
+tests/browser-state2.json
