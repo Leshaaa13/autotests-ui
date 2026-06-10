@@ -1,10 +1,6 @@
-from multiprocessing.managers import ProcessLocalSet
-
 import pytest
 
 from playwright.sync_api import Page, Playwright
-
-from tests.test_fixtures import browser
 
 
 @pytest.fixture()
