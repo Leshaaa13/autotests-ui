@@ -1,18 +1,14 @@
-from playwright.sync_api import expect
+from pages.courses_list_page import CoursesListPage
+import pytest
 
-def test_empty_courses_list2(chromium_page_with_state):
-    page = chromium_page_with_state
+@pytest.mark.courses
+@pytest.mark.regression
+def test_empty_courses_list2(courses_list_page: CoursesListPage):
 
-    page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses")
+    courses_list_page.visit("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses")
 
-    text_courses = page.get_by_test_id('courses-list-toolbar-title-text')
-    expect(text_courses).to_have_text("Courses")
+    courses_list_page.navbar.check_visible('username')
+    courses_list_page.sidebar.check_visible()
 
-    icon_there = page.get_by_test_id('courses-list-empty-view-icon')
-    expect(icon_there).to_be_visible()
-
-    text_there = page.get_by_test_id('courses-list-empty-view-title-text')
-    expect(text_there).to_have_text('There is no results')
-
-    description_text = page.get_by_test_id('courses-list-empty-view-description-text')
-    expect(description_text).to_have_text('Results from the load test pipeline will be displayed here')
+    courses_list_page.toolbar_view.check_visible()
+    courses_list_page.check_visible_empty_view()

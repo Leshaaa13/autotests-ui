@@ -1,42 +1,44 @@
-from playwright.sync_api import sync_playwright, expect
+import pytest
 
-def test_empty_courses_list():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context()
-        page = context.new_page()
+from pages.courses_list_page import CoursesListPage
+from pages.create_course_page import CreateCoursePage
 
-        page.goto('https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration')
+@pytest.mark.courses
+@pytest.mark.regression
+def test_create_course(create_course_page: CreateCoursePage, courses_list_page: CoursesListPage):
+    create_course_page.visit('https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses/create')
+    create_course_page.check_visible_create_course_title()
+    create_course_page.check_disabled_create_course_button()
+    create_course_page.image_upload_widget.check_visible(is_image_uploaded=False)
+    create_course_page.check_visible_create_course_form(title="", estimated_time="", description="", max_score="0",min_score="0")
+    create_course_page.check_visible_exercises_title()
+    create_course_page.check_visible_create_exercise_button()
 
-        email_input = page.get_by_test_id('registration-form-email-input').locator('input')
-        email_input.fill('username@gmail.com')
+    create_course_page.check_visible_exercises_empty_view()
 
-        user_input = page.get_by_test_id('registration-form-username-input').locator('input')
-        user_input.fill('username')
+    create_course_page.image_upload_widget.upload_preview_image("./testdata/files/image.jpg")
 
-        password_input = page.get_by_test_id('registration-form-password-input').locator('input')
-        password_input.fill('password')
+    create_course_page.image_upload_widget.check_visible(is_image_uploaded=True)
+    create_course_page.fill_create_course_form(
+        title='Playwright',
+        estimated_time = "2 weeks",
+        description = "Playwright",
+        max_score = "100",
+        min_score = "10"
+    )
+    create_course_page.click_create_course_button()
 
-        registration_button = page.get_by_test_id('registration-page-registration-button')
-        registration_button.click()
+    courses_list_page.toolbar_view.check_visible()
+    courses_list_page.course_view.check_visible(title="Playwright", max_score="100", min_score="10", estimated_time="2 weeks", index=0)
 
-        context.storage_state(path='browser-state2.json')
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context(storage_state='browser-state2.json')
-        page = context.new_page()
+@pytest.mark.courses
+@pytest.mark.regression
+def test_empty_courses_list(courses_list_page: CoursesListPage):
+    courses_list_page.visit("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses")
 
-        page.goto('https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/courses')
+    courses_list_page.navbar.check_visible('username')
+    courses_list_page.sidebar.check_visible()
 
-        text_courses = page.get_by_test_id('courses-list-toolbar-title-text')
-        expect(text_courses).to_have_text("Courses")
-
-        icon_there = page.get_by_test_id('courses-list-empty-view-icon')
-        expect(icon_there).to_be_visible()
-
-        text_there = page.get_by_test_id('courses-list-empty-view-title-text')
-        expect(text_there).to_have_text('There is no results')
-
-        description_text = page.get_by_test_id('courses-list-empty-view-description-text')
-        expect(description_text).to_have_text('Results from the load test pipeline will be displayed here')
+    courses_list_page.toolbar_view.check_visible()
+    courses_list_page.check_visible_empty_view()
